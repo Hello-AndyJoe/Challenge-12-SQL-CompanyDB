@@ -20,6 +20,18 @@ const db = mysql.createConnection(
   console.log(`Connected to Company Database.`)
 );
 
+db.query('SELECT * FROM department', function (err, results) {
+  console.table(results);
+});
+
+db.query('SELECT * FROM company_role', function (err, results) {
+  console.table(results);
+});
+
+db.query('SELECT * FROM employee', function (err, results) {
+  console.table(results);
+});
+
 app.listen(PORT, () =>
     console.log(`App listening at http://localhost:${PORT}`)
 );
