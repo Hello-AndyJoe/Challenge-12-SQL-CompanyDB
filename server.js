@@ -34,19 +34,6 @@ const startQuestion = {
   ]
 };
 
-const addDeptQuestions = [
-  {
-    type: "input",
-    message: "Department ID: ",
-    name: "deptIDAnswer",
-  },
-  {
-    type: "input",
-    message: "Depatment Name: ",
-    name: "deptNameAnswer",
-  }
-];
-
 function startingPrompt() {
   inquirer.prompt(startQuestion).then(function(startAnswer) {
     switch (startAnswer.start) {
@@ -85,7 +72,7 @@ function startingPrompt() {
 
 function viewDepartment() {
   console.log("Departments");
-  db.query('SELECT * FROM department', function (err, results) {
+  db.query('SELECT dept_name AS Department FROM department', function (err, results) {
     console.table(results);
     startingPrompt();
   });
@@ -116,9 +103,18 @@ function viewEmployees() {
 
 function addDepartment() {
   console.log("Add Department");
+
+  const addDeptQuestions = [
+    {
+      type: "input",
+      message: "Depatment Name: ",
+      name: "deptNameAnswer",
+    }
+  ];
+
   inquirer.prompt(addDeptQuestions).then(function(addDeptAnswers) {
-    db.query(`INSERT INTO department(dept_id, dept_name)
-    VALUES(?, ?)`, [addDeptAnswers.deptIDAnswer, addDeptAnswers.deptNameAnswer], function (err, results) {
+    db.query(`INSERT INTO department(dept_name)
+    VALUES(?)`, (addDeptAnswers.deptNameAnswer), function (err, results) {
 
       console.log(`${addDeptAnswers.deptNameAnswer} Deparment Added`);
       startingPrompt();
@@ -143,11 +139,6 @@ function addRole() {
     const addRoleQuestions = [
       {
         type: "input",
-        message: "Role ID: ",
-        name: "roleIDAnswer",
-      },
-      {
-        type: "input",
         message: "Role Title: ",
         name: "roleTitleAnswer",
       },
@@ -165,8 +156,8 @@ function addRole() {
     ];
     
     inquirer.prompt(addRoleQuestions).then(function(addRoleAnswers) {
-      db.query(`INSERT INTO company_role(role_id, role_title, role_salary, dept_id)
-      VALUES(?, ?, ?, ?)`, [addRoleAnswers.roleIDAnswer, addRoleAnswers.roleTitleAnswer, addRoleAnswers.roleSalaryAnswer, addRoleAnswers.roleDeptAnswer], function (err, results) {
+      db.query(`INSERT INTO company_role(role_title, role_salary, dept_id)
+      VALUES(?, ?, ?)`, [addRoleAnswers.roleTitleAnswer, addRoleAnswers.roleSalaryAnswer, addRoleAnswers.roleDeptAnswer], function (err, results) {
   
         console.log("Role Added");
         startingPrompt();
@@ -232,6 +223,10 @@ function addEmployee() {
             name: row.Employee,
             value: row.employee_id
           }));
+
+          const nullManager = {name:"No Manager", value:null};
+
+          managerChoices.push(nullManager);
       
           const addManagerQuestions = [
             {
@@ -313,6 +308,7 @@ function updateEmployee() {
             choices: updateRoleChoices
           }
         ];
+        
         const selectedUpdateEmployeer = updateSelEmpAnswer.updateSelEmpAnswer;
 
         inquirer.prompt(updateRoleQuestions).then(function(updateEmployeeAnswers) {
