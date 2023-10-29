@@ -4,13 +4,13 @@ CREATE DATABASE company_db;
 USE company_db;
 
 CREATE TABLE department (
-  dept_id INT NOT NULL,
+  dept_id INT NOT NULL AUTO_INCREMENT,
   dept_name VARCHAR(30) NOT NULL,
   PRIMARY KEY (dept_id)
 );
 
 CREATE TABLE company_role (
-  role_id INT NOT NULL,
+  role_id INT NOT NULL AUTO_INCREMENT,
   role_title VARCHAR(30) NOT NULL,
   role_salary DECIMAL(12 ,2) NOT NULL,
   dept_id INT,
