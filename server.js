@@ -56,12 +56,11 @@ function startingPrompt() {
         addEmployee();
         return;
       case "Update Employee Role":
-        updateEmployee();
+        updateEmployeeRole();
         return;
       case "End":
         endDatabase();
         return;
-
 
       default:
         console.log("Stop");
@@ -72,32 +71,47 @@ function startingPrompt() {
 
 function viewDepartment() {
   console.log("Departments");
-  db.query('SELECT dept_name AS Department FROM department', function (err, results) {
-    console.table(results);
-    startingPrompt();
+  db.query('SELECT dept_id AS ID, dept_name AS Department FROM department', function (err, results) {
+    if (err) {
+      console.error('Error retrieving data from table:', err);
+      db.end(); }
+    else {  
+      console.table(results);
+      startingPrompt();
+    }
   });
 }
 
 function viewRoles() {
   console.log("Roles");
-  db.query(`SELECT company_role.role_title, company_role.role_salary, department.dept_name
+  db.query(`SELECT company_role.role_id, company_role.role_title, company_role.role_salary, department.dept_name
     FROM company_role
     INNER JOIN department ON company_role.dept_id=department.dept_id`, function (err, results) {
-      console.table(results);
-      startingPrompt();
+      if (err) {
+        console.error('Error retrieving data from table:', err);
+        db.end(); }
+      else {  
+        console.table(results);
+        startingPrompt();
+      }
   });
 }
 
 function viewEmployees() {
   console.log("Employees");
-  db.query(`SELECT CONCAT(employee.first_name, " ", employee.last_name) AS Employee, 
+  db.query(`SELECT employee.employee_id, CONCAT(employee.first_name, " ", employee.last_name) AS Employee, 
   company_role.role_title, 
   CONCAT(manager.last_name, ", " , manager.first_name) AS Manager
   FROM employee
   LEFT JOIN employee manager ON employee.manager_id = manager.employee_id
   INNER JOIN company_role ON employee.role_id=company_role.role_id;`, function (err, results) {
-    console.table(results);
-    startingPrompt();
+    if (err) {
+      console.error('Error retrieving data from table:', err);
+      db.end(); }
+    else {  
+      console.table(results);
+      startingPrompt();
+    }
   });
 }
 
@@ -261,7 +275,7 @@ function addEmployee() {
   });
 }
 
-function updateEmployee() {
+function updateEmployeeRole() {
   console.log("Update Employee Role");
 
   db.query(`SELECT employee.employee_id,
