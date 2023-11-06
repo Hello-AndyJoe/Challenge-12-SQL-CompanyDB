@@ -56,6 +56,7 @@ The [W3 Schools Javascipt Maps](https://www.w3schools.com/js/js_object_maps.asp)
 
 [NPM Inquirer 8.2.4](https://www.npmjs.com/package/inquirer/v/8.2.4) and its documentation used for the construction of the questions that appear via prompts. 
 
+[mysql2 2.1.0](https://www.npmjs.com/package/mysql2/v/2.1.0) was used in the construction of this application.
 
 ## License
 
