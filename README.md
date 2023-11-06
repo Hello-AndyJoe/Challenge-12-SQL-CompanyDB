@@ -50,7 +50,7 @@ Enter `node server.js` to begin the starting prompt and select from the various 
 
 ## Contributions
 
-All Activities of Module 12 - SQL where used for reference in the creation of this application.
+All Activities of Module 12 - SQL were used for reference in the creation of this application.
 
 The [W3 Schools Javascipt Maps](https://www.w3schools.com/js/js_object_maps.asp) was reference in creating the mapping needed to have various table options selectable in the inquirer prompt.
 
