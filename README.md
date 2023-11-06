@@ -27,7 +27,7 @@ Once the required software has been successfully installed on the computer, clon
 
 [The Repository of the MySql Company Database](https://github.com/Hello-AndyJoe/Challenge-12-SQL-CompanyDB)
 
-The cloned repository does not include the node_module foldr containing the Inquirer, Express or MySQL2 NPMs. Install them into the repository by running `npm i` in a GitBash terminal within Visual Studio Code. 
+The cloned repository does not include the node_module folder containing the Inquirer, Express or MySQL2 NPMs. Install them into the repository by running `npm i` in a GitBash terminal within Visual Studio Code. 
 
 
 ## Usage
