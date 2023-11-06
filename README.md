@@ -5,7 +5,7 @@
 
 ## Description
 
-This application can be used in the managing of departments, their employees, job roles, salaries and various other metrics.
+This application can be used in the managing of departments, their employees, job roles, salaries and various other metrics for small companies.
 
 
 ## Table of Contents
