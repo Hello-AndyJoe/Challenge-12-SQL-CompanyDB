@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const mysql = require('mysql2');
 
+// Connects to the database; replace the value of password with your MySql password
 const db = mysql.createConnection(
   {
     host: 'localhost',
@@ -18,6 +19,7 @@ db.connect(function(err) {
   startingPrompt();
 });
 
+// The questions that appearing in the starting prompt
 const startQuestion = {
   type: "list",
   message: "Select Option: ",
@@ -34,6 +36,7 @@ const startQuestion = {
   ]
 };
 
+// The starting prompt for accessing, adding and editing the data in the company database
 function startingPrompt() {
   inquirer.prompt(startQuestion).then(function(startAnswer) {
     switch (startAnswer.start) {
@@ -72,13 +75,8 @@ function startingPrompt() {
 function viewDepartment() {
   console.log("Departments");
   db.query('SELECT dept_id AS ID, dept_name AS Department FROM department', function (err, results) {
-    if (err) {
-      console.error('Error retrieving data from table:', err);
-      db.end(); }
-    else {  
-      console.table(results);
-      startingPrompt();
-    }
+    console.table(results);
+    startingPrompt();
   });
 }
 
@@ -87,31 +85,23 @@ function viewRoles() {
   db.query(`SELECT company_role.role_id, company_role.role_title, company_role.role_salary, department.dept_name
     FROM company_role
     INNER JOIN department ON company_role.dept_id=department.dept_id`, function (err, results) {
-      if (err) {
-        console.error('Error retrieving data from table:', err);
-        db.end(); }
-      else {  
-        console.table(results);
-        startingPrompt();
-      }
+      console.table(results);
+      startingPrompt();
   });
 }
 
 function viewEmployees() {
   console.log("Employees");
   db.query(`SELECT employee.employee_id, CONCAT(employee.first_name, " ", employee.last_name) AS Employee, 
-  company_role.role_title, 
-  CONCAT(manager.last_name, ", " , manager.first_name) AS Manager
+  company_role.role_title, company_role.role_salary,
+  CONCAT(manager.last_name, ", " , manager.first_name) AS Manager,
+  department.dept_name AS Department
   FROM employee
   LEFT JOIN employee manager ON employee.manager_id = manager.employee_id
-  INNER JOIN company_role ON employee.role_id=company_role.role_id;`, function (err, results) {
-    if (err) {
-      console.error('Error retrieving data from table:', err);
-      db.end(); }
-    else {  
-      console.table(results);
-      startingPrompt();
-    }
+  INNER JOIN company_role ON employee.role_id=company_role.role_id
+  INNER JOIN department ON company_role.dept_id=department.dept_id;`, function (err, results) {
+    console.table(results);
+    startingPrompt();
   });
 }
 
@@ -189,17 +179,13 @@ function addEmployee() {
       return;
     }
   
+    // Creates an array of objects featuring the role title and its respective id value
     const roleChoices = results.map(row => ({
       name: row.role_title,
       value: row.role_id
     }));
 
     const addEmployeeQuestions = [
-      {
-        type: "input",
-        message: "Employee ID: ",
-        name: "employeeIDAnswer",
-      },
       {
         type: "input",
         message: "First Name: ",
@@ -215,12 +201,13 @@ function addEmployee() {
         name: 'employeeRoleAnswer',
         message: 'Select a role for employee:',
         choices: roleChoices
+        // Uses the array of objects from above for the selected options for this prompt question
       }
     ];
     
     inquirer.prompt(addEmployeeQuestions).then(function(addEmployeeAnswers) {
-      db.query(`INSERT INTO employee(employee_id, first_name, last_name, role_id)
-      VALUES(?, ?, ?, ?)`, [addEmployeeAnswers.employeeIDAnswer, addEmployeeAnswers.firstNameAnswer, addEmployeeAnswers.lastNameAnswer, addEmployeeAnswers.employeeRoleAnswer], function (err, results) {
+      db.query(`INSERT INTO employee(first_name, last_name, role_id)
+      VALUES(?, ?, ?)`, [addEmployeeAnswers.firstNameAnswer, addEmployeeAnswers.lastNameAnswer, addEmployeeAnswers.employeeRoleAnswer], function (err, results) {
   
         db.query(`SELECT employee.employee_id,
         CONCAT(employee.first_name, " ", employee.last_name) AS Employee, 
@@ -233,13 +220,14 @@ function addEmployee() {
             return;
           }
         
+          // Creates an array of employee featuring the role title and their respective id value
           const managerChoices = results.map(row => ({
             name: row.Employee,
             value: row.employee_id
           }));
 
+          // Adds an object with no employee id value to the manageChoices array
           const nullManager = {name:"No Manager", value:null};
-
           managerChoices.push(nullManager);
       
           const addManagerQuestions = [
@@ -248,10 +236,11 @@ function addEmployee() {
               name: 'employeeManagerAnswer',
               message: 'Select a manager for employee:',
               choices: managerChoices
+              // Uses the array of objects from above for the selected options for this prompt question
             }
           ];
           
-          const selectedEmployeer = addEmployeeAnswers.employeeIDAnswer;
+          const selectedEmployeer = addEmployeeAnswers.firstNameAnswer + " " + addEmployeeAnswers.lastNameAnswer;
 
           inquirer.prompt(addManagerQuestions).then(function(addManagerAnswers) {
 
@@ -259,12 +248,9 @@ function addEmployee() {
 
             db.query(`UPDATE employee
             SET manager_id = ?
-            WHERE employee_id = ?`, [selectedManager, selectedEmployeer], function (err, results) {
+            WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`, [selectedManager, selectedEmployeer], function (err, results) {
         
               console.log("Employee Added");
-              console.log(selectedEmployeer);
-              console.log(selectedManager);
-              console.log(managerChoices);
               startingPrompt();
             });
           });
@@ -344,6 +330,6 @@ function updateEmployeeRole() {
 }
 
 function endDatabase() {
-  console.error('Exiting Database');
+  console.log('Exiting Database');
   db.end();
 }
